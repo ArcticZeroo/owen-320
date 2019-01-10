@@ -112,6 +112,32 @@ export default class VideoModule extends Module {
         }
     }
 
+    private centerPlayButton(videoContainer: HTMLElement) {
+        const { offsetHeight: containerHeight, offsetWidth: containerWidth } = videoContainer;
+
+        const playButton = document.getElementsByClassName(domIdentifiers.videoPlayButtonClass)[0];
+
+        if (!playButton) {
+            return;
+        }
+
+        if (!(playButton instanceof HTMLElement)) {
+            return;
+        }
+
+        const { offsetHeight: buttonHeight, offsetWidth: buttonWidth } = playButton;
+
+        if (!containerHeight || !containerWidth || !buttonHeight || !buttonWidth) {
+            return;
+        }
+
+        const newTop = (containerHeight - buttonHeight) / 2;
+        const newLeft = (containerWidth - buttonWidth) / 2;
+
+        playButton.style.top = `${newTop}px`;
+        playButton.style.left = `${newLeft}px`;
+    }
+
     private addVideoHooks(video: HTMLVideoElement) {
         const videoContainer = document.getElementById(domIdentifiers.videoContainerId);
 
@@ -125,6 +151,7 @@ export default class VideoModule extends Module {
         this.setupPlaybackDisplay(video);
         this.addTapHandler(videoContainer);
         this.addKeyHandlers(videoContainer, video);
+        this.centerPlayButton(videoContainer);
     }
 
     start(): void {
