@@ -131,7 +131,7 @@ export default class VideoModule extends Module {
 
         const videoContainer = document.getElementsByClassName(domIdentifiers.videoClass)[0];
 
-        const observer = new MutationObserver(this.onMutation.bind(this));
+        const observer = new MutationObserver(this.onMutation);
 
         observer.observe(videoContainer, { childList: true, subtree: true });
     }
