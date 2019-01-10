@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Adds extra functionality to the owen 320 page",
   "content_scripts": [{
-    "js": ["content.js"],
+    "js": ["bundle.js"],
     "matches": ["https://facweb.cse.msu.edu/cbowen/cse320/*"],
     "run_at": "document_idle"
   }]
