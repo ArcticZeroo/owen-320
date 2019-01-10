@@ -51,8 +51,13 @@ abstract class Page {
         return document.getElementById(videoId) as HTMLVideoElement;
     }
 
-    static getStepData(): IStepData {
+    static getStepData(): IStepData | null {
         const element = document.getElementById(stepDataId);
+
+        if (!element) {
+            return null;
+        }
+
         const dataText = element.innerText;
 
         return JSON.parse(dataText);
@@ -83,6 +88,10 @@ class StepController {
     }
 
     private processData() {
+        if (!this._data) {
+            return;
+        }
+
         for (let i = 0; i < this._data.sections.length; ++i) {
             const section = this._data.sections[i];
 

@@ -25,6 +25,9 @@ var Page = /** @class */ (function () {
     };
     Page.getStepData = function () {
         var element = document.getElementById(stepDataId);
+        if (!element) {
+            return null;
+        }
         var dataText = element.innerText;
         return JSON.parse(dataText);
     };
@@ -53,6 +56,9 @@ var StepController = /** @class */ (function () {
         this.processData();
     }
     StepController.prototype.processData = function () {
+        if (!this._data) {
+            return;
+        }
         for (var i = 0; i < this._data.sections.length; ++i) {
             var section = this._data.sections[i];
             if (section.tag === this._data.current) {
