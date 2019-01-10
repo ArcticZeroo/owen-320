@@ -1,18 +1,23 @@
 import IStepData from '../../../interfaces/step/IStepData';
 import IStepMetadata from '../../../interfaces/step/IStepMetadata';
 import domIdentifiers from '../../config/domIdentifiers';
+import ClassUtil from '../../util/ClassUtil';
 import PageUtil from '../../util/PageUtil';
 import Module from '../Module';
 
 export default class StepModule extends Module {
     readonly data: IStepData | null;
     readonly metadata: IStepMetadata | null;
+    private sectionHoverDiv?: HTMLElement;
+    private sectionNameToIndex: { [key: string]: number } = {};
 
     constructor() {
         super();
 
+        ClassUtil.autoBind(this);
+
         this.data = StepModule.getStepData();
-        this.metadata = StepModule.processData(this.data);
+        this.metadata = this.processData(this.data);
     }
 
     static getStepData(): IStepData | null {
@@ -27,7 +32,7 @@ export default class StepModule extends Module {
         return JSON.parse(dataText);
     }
 
-    static processData(data: IStepData | null): IStepMetadata | null {
+    private processData(data: IStepData | null): IStepMetadata | null {
         if (!data) {
             return null;
         }
@@ -41,12 +46,13 @@ export default class StepModule extends Module {
         for (let i = 0; i < data.sections.length; ++i) {
             const section = data.sections[i];
 
-            if (section.tag === data.current) {
+            this.sectionNameToIndex[section.name] = i;
+
+            if (!current && section.tag === data.current) {
                 current = {
                     section,
                     index: i
                 };
-                break;
             }
         }
 
@@ -60,31 +66,78 @@ export default class StepModule extends Module {
         };
     }
 
+    private getProgressString(current: number) {
+        return `(${ current }/${ this.totalSections })`;
+    }
+
     private get totalSections(): number {
         return (this.data && this.data.sections && this.data.sections.length) || 0;
     }
 
-    start(): void {
-        if (!this.data || !this.metadata || !this.metadata.isStepEnabled) {
-            return;
+    private onSectionHoverMutate(mutations: MutationRecord[]) {
+        for (const mutation of mutations) {
+            let target: HTMLElement;
+
+            if (mutation.target instanceof HTMLElement) {
+                target = mutation.target;
+            } else {
+                if (mutation.type === 'characterData' && this.sectionHoverDiv) {
+                    target = this.sectionHoverDiv;
+                } else {
+                    continue;
+                }
+            }
+
+            let pageName = target.innerText.trim();
+
+            if (!this.sectionNameToIndex.hasOwnProperty(pageName)) {
+                if (pageName.endsWith('(cont)')) {
+                    pageName = pageName.replace(/\s+\(cont\)\s*/, '').trim();
+                }
+
+                // Check again in case the cont removal fixed it
+                if (!this.sectionNameToIndex.hasOwnProperty(pageName)) {
+                    continue;
+                }
+            }
+
+            target.innerText += ` ${ this.getProgressString(this.sectionNameToIndex[pageName] + 1) }`;
+            break;
         }
+    }
 
-        if (!this.metadata.current) {
-            return;
-        }
-
-        console.log('Current section:', this.metadata.current);
-        console.log('Total sections:', this.totalSections);
-
+    private addNavBarProgressIndicator() {
         const navigationBar = PageUtil.getNavigationBar();
 
-        if (!navigationBar) {
+        if (!navigationBar || !this.metadata || !this.metadata.current) {
             return;
         }
 
         const progressElement = document.createElement('li');
-        progressElement.innerText = `Progress: (${this.metadata.current.index + 1}/${this.totalSections})`;
+        progressElement.innerText = `Progress: ${ this.getProgressString(this.metadata.current.index + 1) }`;
 
         navigationBar.appendChild(progressElement);
+    }
+
+    private addHoverProgressIndicator() {
+        const hoverDiv = document.querySelector(`.${ domIdentifiers.stepProgressClass } div`);
+
+        if (!hoverDiv) {
+            return;
+        }
+
+        this.sectionHoverDiv = hoverDiv as HTMLElement;
+
+        new MutationObserver(this.onSectionHoverMutate)
+            .observe(hoverDiv, { characterData: true, attributes: true, subtree: true });
+    }
+
+    private addProgressIndicators() {
+        this.addNavBarProgressIndicator();
+        this.addHoverProgressIndicator();
+    }
+
+    start(): void {
+        this.addProgressIndicators();
     }
 }

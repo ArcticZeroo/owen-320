@@ -6,5 +6,6 @@ export default {
     stepDataId: 'cl-step',
     siteDataId: 'cl-site',
     msuLinkHeaderClass: 'masthead',
-    videoPlayButtonClass: 'vjs-big-play-button                  '
+    videoPlayButtonClass: 'vjs-big-play-button',
+    stepProgressClass: 'cl-step-progress'
 }
