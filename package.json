@@ -1,25 +1,22 @@
 {
-  "name": "owen-playback",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
-    "react-scripts": "2.1.3"
-  },
+  "name": "owen-320",
+  "version": "1.0.0",
+  "description": "better 320 site",
+  "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "mocha"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arcticzeroo/owen-320.git"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "author": "novicksp@msu.edu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arcticzeroo/owen-320/issues"
+  },
+  "homepage": "https://github.com/arcticzeroo/owen-320#readme",
+  "devDependencies": {
+    "@types/chrome": "0.0.77"
+  }
 }
