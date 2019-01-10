@@ -95,6 +95,10 @@ class StepController {
     }
 
     displayProgress() {
+        if (!this.isStepEnabled) {
+            return;
+        }
+
         const navList = Page.getNavBarList();
 
         if (!navList) {
@@ -164,3 +168,5 @@ if (Page.isPageQuiz) {
 }
 
 const stepController = new StepController();
+
+stepController.displayProgress();

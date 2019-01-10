@@ -63,6 +63,9 @@ var StepController = /** @class */ (function () {
         }
     };
     StepController.prototype.displayProgress = function () {
+        if (!this.isStepEnabled) {
+            return;
+        }
         var navList = Page.getNavBarList();
         if (!navList) {
             console.log('Could not show progress; list is null');
@@ -131,4 +134,5 @@ if (Page.isPageQuiz) {
     console.log('This page is a quiz');
 }
 var stepController = new StepController();
+stepController.displayProgress();
 //# sourceMappingURL=content.js.map
