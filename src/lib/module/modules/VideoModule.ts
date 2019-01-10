@@ -8,7 +8,7 @@ export default class VideoModule extends Module {
     private static _secondsToScrub: number = 5;
     private static _playbackRateChange: number = 0.125;
     private _video?: HTMLVideoElement;
-    private _videoContainer?: HTMLDivElement;
+    private _videoContainer?: HTMLElement;
     private _playbackDisplay?: HTMLElement;
 
     constructor() {
@@ -57,27 +57,7 @@ export default class VideoModule extends Module {
         this._playbackDisplay.innerText = `Playback Speed: ${newPlaybackRate}`;
     }
 
-    private addVideoHooks(video: HTMLVideoElement) {
-        const videoContainer = document.getElementById(domIdentifiers.videoContainerId);
-
-        if (!videoContainer) {
-            return;
-        }
-
-        this._videoContainer = videoContainer as HTMLDivElement;
-        this._video = video;
-
-        const videoContentDiv = document.getElementsByClassName(domIdentifiers.videoClass)[0];
-
-        if (videoContentDiv) {
-            this._playbackDisplay = document.createElement('div');
-            this.updatePlaybackRate(this._video.playbackRate);
-            videoContentDiv.insertAdjacentElement('afterend', this._playbackDisplay);
-        }
-
-        const tapListener = new TapEventListener(this._videoContainer, this.onTap);
-        tapListener.listen();
-
+    private addKeyHandlers(videoContainer: HTMLElement, video: HTMLVideoElement) {
         videoContainer.addEventListener('keydown',  (e: KeyboardEvent) => {
             if (['ArrowLeft'].includes(e.key)) {
                 video.currentTime = Math.max(video.currentTime - VideoModule._secondsToScrub, 0);
@@ -115,6 +95,36 @@ export default class VideoModule extends Module {
                 return;
             }
         });
+    }
+
+    private addTapHandler(videoContainer: HTMLElement) {
+        const tapListener = new TapEventListener(videoContainer, this.onTap);
+        tapListener.listen();
+    }
+
+    private setupPlaybackDisplay(video: HTMLVideoElement) {
+        const videoContentDiv = document.getElementsByClassName(domIdentifiers.videoClass)[0];
+
+        if (videoContentDiv) {
+            this._playbackDisplay = document.createElement('div');
+            this.updatePlaybackRate(video.playbackRate);
+            videoContentDiv.insertAdjacentElement('afterend', this._playbackDisplay);
+        }
+    }
+
+    private addVideoHooks(video: HTMLVideoElement) {
+        const videoContainer = document.getElementById(domIdentifiers.videoContainerId);
+
+        if (!videoContainer) {
+            return;
+        }
+
+        this._videoContainer = videoContainer;
+        this._video = video;
+
+        this.setupPlaybackDisplay(video);
+        this.addTapHandler(videoContainer);
+        this.addKeyHandlers(videoContainer, video);
     }
 
     start(): void {
