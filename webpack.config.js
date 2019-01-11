@@ -20,6 +20,6 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     plugins: [
-        new CopyWebpackPlugin(['src/manifest.json'])
+        new CopyWebpackPlugin([{ from: 'static' }])
     ]
 };

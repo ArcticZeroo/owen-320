@@ -7,5 +7,10 @@
     "js": ["bundle.js"],
     "matches": ["https://facweb.cse.msu.edu/cbowen/cse320/*"],
     "run_at": "document_idle"
-  }]
+  }],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }
