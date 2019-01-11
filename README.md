@@ -40,6 +40,8 @@ I don't feel like dealing with chrome webstore publishing (never done it and I s
 1. Clone this repo
 2. Go to `about://extensions`
 3. Toggle the button on the top right to enable developer mode extensions if it is off
-4. Click "load unpacked", and select "dist/" from the cloned repo (the whole folder)
+4. Click "load unpacked", and select `dist/` from the cloned repo (the whole folder)
 5. ??? 
 6. Profit!
+
+It's generally a bad idea to just install random github code into chrome, so if you want to be sure that `dist/bundle.js` isn't some malicious code (it's not, but there's no reason you need to believe a random person on the internet), you can clone this repo, open up the terminal, run `npm install`, and then `npx webpack`. The project will bundle all the TS to `dist/bundle.js` and copy the manifest there as well. 
