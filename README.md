@@ -18,6 +18,7 @@ Obviously it only works on owen's 320 website.
 
 * The navigation bar now shows your current progress in the assignment
 * Hovering over the green bar also shows the progress of that element
+* There is an extra nav bar on the bottom of the assignment pages now (you can't hover over it though, too lazy to figure that out)
 
 #### Videos
 

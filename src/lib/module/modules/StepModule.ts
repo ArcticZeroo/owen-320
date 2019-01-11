@@ -2,6 +2,7 @@ import IStepData from '../../../interfaces/step/IStepData';
 import IStepMetadata from '../../../interfaces/step/IStepMetadata';
 import domIdentifiers from '../../config/domIdentifiers';
 import ClassUtil from '../../util/ClassUtil';
+import DomUtil from '../../util/DomUtil';
 import PageUtil from '../../util/PageUtil';
 import Module from '../Module';
 
@@ -137,7 +138,37 @@ export default class StepModule extends Module {
         this.addHoverProgressIndicator();
     }
 
+    private addDuplicateNav() {
+        const nav = document.getElementsByClassName(domIdentifiers.navDivClass)[0];
+
+        if (!nav) {
+            console.log('Skipping nav duplication because the div could not be found');
+            return;
+        }
+
+        const content = document.getElementsByClassName('content')[0];
+
+        if (!content) {
+            console.log('Skipping nav duplication because the content cannot be found');
+            return;
+        }
+
+        console.log('Duplicating nav...');
+        const clonedNav = nav.cloneNode(true) as HTMLDivElement;
+
+        const originalCanvas = nav.querySelector('canvas');
+        const clonedCanvas = clonedNav.querySelector('canvas');
+
+        if (originalCanvas && clonedCanvas) {
+            DomUtil.cloneCanvas(originalCanvas, clonedCanvas);
+            clonedCanvas.title = 'Hovering on the duplicate nav is not currently supported';
+        }
+
+        content.insertAdjacentElement('afterend', clonedNav);
+    }
+
     start(): void {
         this.addProgressIndicators();
+        this.addDuplicateNav();
     }
 }
