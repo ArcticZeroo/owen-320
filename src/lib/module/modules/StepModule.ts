@@ -142,18 +142,15 @@ export default class StepModule extends Module {
         const nav = document.getElementsByClassName(domIdentifiers.navDivClass)[0];
 
         if (!nav) {
-            console.log('Skipping nav duplication because the div could not be found');
             return;
         }
 
         const content = document.getElementsByClassName('content')[0];
 
         if (!content) {
-            console.log('Skipping nav duplication because the content cannot be found');
             return;
         }
 
-        console.log('Duplicating nav...');
         const clonedNav = nav.cloneNode(true) as HTMLDivElement;
 
         const originalCanvas = nav.querySelector('canvas');
