@@ -33,6 +33,7 @@ Obviously it only works on owen's 320 website.
 #### Quizzes
 
 * Once you've answered a question, you can now press `Enter` or `Right Arrow` to continue to the next question (before you could press enter to submit an answer but not go to the next question)
+    * These keys (enter and right arrow) can also start a quiz if you are on the main page of one.
 * Quiz inputs no longer have autofill! This should prevent giant annoying walls of autofill suggestions.
 * The first input box in a quiz (that's not hidden -- since there's a few hidden input boxes) is now focused automatically at the start of a question, to make it easier to tab through things
 

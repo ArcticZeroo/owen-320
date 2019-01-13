@@ -20,19 +20,48 @@ export default class QuizModule extends Module {
         this.quizContainer = document.getElementsByClassName(domIdentifiers.quizClass)[0] as HTMLDivElement;
     }
 
-    private addNextQuizButtonHooks() {
+    private startQuizWithResult(): boolean {
+        if (!this.quizContainer) {
+            return false;
+        }
+
+        const startQuizTag = this.quizContainer.querySelector('a');
+
+        if (!startQuizTag) {
+            return false;
+        }
+
+        if (!startQuizTag.innerText.includes('click to proceed to the quiz.')) {
+            return false;
+        }
+
+        startQuizTag.click();
+        return true;
+    }
+
+    private tryToGoToNextQuestion() {
+        const nextQuestionButton = QuizModule.getNextQuestionButton();
+
+        if (!nextQuestionButton || !nextQuestionButton.innerText.toLowerCase().includes('next')) {
+            return;
+        }
+
+        nextQuestionButton.click();
+    }
+
+    private addNextButtonHooks() {
         document.onkeydown = (e: KeyboardEvent) => {
             if (!QuizModule.quizContinueKeys.includes(e.key)) {
                 return;
             }
 
-            const nextQuestionButton = QuizModule.getNextQuestionButton();
+            const couldStartQuiz = this.startQuizWithResult();
 
-            if (!nextQuestionButton || !nextQuestionButton.innerText.toLowerCase().includes('next')) {
+            if (couldStartQuiz) {
                 return;
             }
 
-            nextQuestionButton.click();
+            this.tryToGoToNextQuestion();
         };
     }
 
@@ -55,7 +84,7 @@ export default class QuizModule extends Module {
             return;
         }
 
-        this.addNextQuizButtonHooks();
+        this.addNextButtonHooks();
 
         new QuizListener({ onQuestion: this.onNewQuizQuestion }).listen();
     }
