@@ -142,16 +142,28 @@ export default class StepModule extends Module {
         const nav = document.getElementsByClassName(domIdentifiers.navDivClass)[0];
 
         if (!nav) {
+            console.error('Could not find navigation bar to duplicate');
             return;
         }
 
         const content = document.getElementsByClassName('content')[0];
 
         if (!content) {
+            console.error('Could not find content to duplicate navigation bar to');
             return;
         }
 
         const clonedNav = nav.cloneNode(true) as HTMLDivElement;
+
+        const completeStepButton = nav.getElementsByClassName('cl-step-completed-next')[0] as HTMLLinkElement;
+        const clonedCompleteStepButton = clonedNav.getElementsByClassName('cl-step-completed-next')[0] as HTMLLinkElement;
+
+        if (completeStepButton || clonedCompleteStepButton) {
+            clonedCompleteStepButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                completeStepButton.click();
+            });
+        }
 
         const originalCanvas = nav.querySelector('canvas');
         const clonedCanvas = clonedNav.querySelector('canvas');
