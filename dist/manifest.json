@@ -5,7 +5,7 @@
   "description": "Adds extra functionality to the owen 320 page",
   "content_scripts": [{
     "js": ["bundle.js"],
-    "matches": ["https://facweb.cse.msu.edu/cbowen/cse320/*"],
+    "matches": ["https://facweb.cse.msu.edu/cbowen/cse*"],
     "run_at": "document_idle"
   }],
   "icons": {
