@@ -1,0 +1,28 @@
+{
+  "name": "owen-320",
+  "version": "1.0.0",
+  "description": "better 320 site",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arcticzeroo/owen-320.git"
+  },
+  "author": "novicksp@msu.edu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arcticzeroo/owen-320/issues"
+  },
+  "homepage": "https://github.com/arcticzeroo/owen-320#readme",
+  "devDependencies": {
+    "@types/chrome": "0.0.77",
+    "copy-webpack-plugin": "^4.6.0",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.3.8",
+    "webpack-dev-server": "^3.1.14"
+  }
+}
