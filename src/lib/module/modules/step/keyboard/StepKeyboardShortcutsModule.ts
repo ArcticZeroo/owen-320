@@ -13,7 +13,7 @@ export default class StepKeyboardShortcutsModule extends Module {
             return true;
         }
 
-        return !StepKeyboardShortcutsModule.illegalActiveTagNamesForShortcuts.includes(activeElement.tagName);
+        return !StepKeyboardShortcutsModule.illegalActiveTagNamesForShortcuts.includes(activeElement.tagName.toLowerCase());
     }
 
     private addKeyboardHooks() {
@@ -37,10 +37,10 @@ export default class StepKeyboardShortcutsModule extends Module {
     }
 
     start(): void {
-        this.shortcuts.set(['KeyN'], this.stepNavController.goToNext);
-        this.shortcuts.set(['KeyB'], this.stepNavController.goToPrevious);
-        this.shortcuts.set(['KeyL'], this.stepNavController.goToList);
-        this.shortcuts.set(['KeyM'], this.stepNavController.goToNextAndMark);
+        this.shortcuts.set(['N'], this.stepNavController.goToNext);
+        this.shortcuts.set(['B'], this.stepNavController.goToPrevious);
+        this.shortcuts.set(['L'], this.stepNavController.goToList);
+        this.shortcuts.set(['M'], this.stepNavController.goToNextAndMark);
 
         this.addKeyboardHooks();
     }
