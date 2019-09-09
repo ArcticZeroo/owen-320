@@ -1,12 +1,13 @@
 import QuizListener, { IQuestionData } from '../../api/quiz/QuizListener';
 import domIdentifiers from '../../config/domIdentifiers';
 import ClassUtil from '../../util/ClassUtil';
+import Debounce from '../../util/Debounce';
 import PageUtil from '../../util/PageUtil';
 import Module from '../Module';
 
 export default class QuizModule extends Module {
     private static quizContinueKeys: string[] = ['Enter', 'ArrowRight'];
-    private quizContainer: HTMLDivElement;
+    private readonly quizContainer: HTMLDivElement;
 
     static getNextQuestionButton(): HTMLButtonElement | null {
         return document.querySelector(`.${domIdentifiers.quizClass} button`);
@@ -17,6 +18,7 @@ export default class QuizModule extends Module {
 
         ClassUtil.autoBind(this);
 
+        this.tryToGoToNextQuestion = Debounce.debounceMethod(100, this.tryToGoToNextQuestion);
         this.quizContainer = document.getElementsByClassName(domIdentifiers.quizClass)[0] as HTMLDivElement;
     }
 
@@ -50,7 +52,7 @@ export default class QuizModule extends Module {
     }
 
     private addNextButtonHooks() {
-        document.onkeydown = (e: KeyboardEvent) => {
+        document.addEventListener('keydown', (e: KeyboardEvent) => {
             if (!QuizModule.quizContinueKeys.includes(e.key)) {
                 return;
             }
@@ -62,7 +64,7 @@ export default class QuizModule extends Module {
             }
 
             this.tryToGoToNextQuestion();
-        };
+        });
     }
 
     private onNewQuizQuestion() {
