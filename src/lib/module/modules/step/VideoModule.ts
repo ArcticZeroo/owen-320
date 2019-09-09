@@ -1,8 +1,8 @@
-import domIdentifiers from '../../config/domIdentifiers';
-import TapEventListener from '../../event/TapEventListener';
-import ClassUtil from '../../util/ClassUtil';
-import PageUtil from '../../util/PageUtil';
-import Module from '../Module';
+import domIdentifiers from '../../../config/domIdentifiers';
+import TapEventListener from '../../../event/TapEventListener';
+import ClassUtil from '../../../util/ClassUtil';
+import PageUtil from '../../../util/PageUtil';
+import Module from '../../Module';
 
 export default class VideoModule extends Module {
     private static _secondsToScrub: number = 5;
