@@ -1,12 +1,14 @@
 import domIdentifiers from '../../../config/domIdentifiers';
+import localStorageIdentifiers from '../../../config/localStorageIdentifiers';
 import TapEventListener from '../../../event/TapEventListener';
 import ClassUtil from '../../../util/ClassUtil';
 import PageUtil from '../../../util/PageUtil';
+import StorageUtil from '../../../util/StorageUtil';
 import Module from '../../Module';
 
 export default class VideoModule extends Module {
     private static _secondsToScrub: number = 5;
-    private static _playbackRateChange: number = 0.125;
+    private static _playbackRateIncrementInSeconds: number = 0.125;
     private _video?: HTMLVideoElement;
     private _videoContainer?: HTMLElement;
     private _playbackDisplay?: HTMLElement;
@@ -55,6 +57,7 @@ export default class VideoModule extends Module {
 
         this._video.playbackRate = newPlaybackRate;
         this._playbackDisplay.innerText = `Playback Speed: ${newPlaybackRate}`;
+        StorageUtil.setItem(localStorageIdentifiers.videoPlaybackSpeed, newPlaybackRate);
     }
 
     private addKeyHandlers(video: HTMLVideoElement) {
@@ -72,13 +75,13 @@ export default class VideoModule extends Module {
             }
 
             if (['_', '-'].includes(e.key)) {
-                this.updatePlaybackRate(Math.max(video.playbackRate - VideoModule._playbackRateChange, 0));
+                this.updatePlaybackRate(Math.max(video.playbackRate - VideoModule._playbackRateIncrementInSeconds, 0));
                 e.preventDefault();
                 return;
             }
 
             if (['+', '='].includes(e.key)) {
-                this.updatePlaybackRate(video.playbackRate + VideoModule._playbackRateChange);
+                this.updatePlaybackRate(video.playbackRate + VideoModule._playbackRateIncrementInSeconds);
                 e.preventDefault();
                 return;
             }
@@ -138,6 +141,22 @@ export default class VideoModule extends Module {
         playButton.style.left = `${newLeft}px`;
     }
 
+    private setInitialSpeedFromStorage(video: HTMLVideoElement) {
+        const storedPlaybackSpeedString = StorageUtil.getItem(localStorageIdentifiers.videoPlaybackSpeed);
+
+        if (!storedPlaybackSpeedString) {
+            return;
+        }
+
+        const storedPlaybackSpeedValue = Number.parseFloat(storedPlaybackSpeedString);
+
+        if (Number.isNaN(storedPlaybackSpeedValue)) {
+            return;
+        }
+
+        video.playbackRate = storedPlaybackSpeedValue;
+    }
+
     private addVideoHooks(video: HTMLVideoElement) {
         const videoContainer = document.getElementById(domIdentifiers.videoContainerId);
 
@@ -148,6 +167,7 @@ export default class VideoModule extends Module {
         this._videoContainer = videoContainer;
         this._video = video;
 
+        this.setInitialSpeedFromStorage(video);
         this.setupPlaybackDisplay(video);
         this.addTapHandler(videoContainer);
         this.addKeyHandlers(video);
