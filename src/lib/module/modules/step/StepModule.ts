@@ -1,11 +1,15 @@
-import IStepData from '../../../interfaces/step/IStepData';
-import IStepMetadata from '../../../interfaces/step/IStepMetadata';
-import domIdentifiers from '../../config/domIdentifiers';
-import ClassUtil from '../../util/ClassUtil';
-import DomUtil from '../../util/DomUtil';
-import PageUtil from '../../util/PageUtil';
-import Module from '../Module';
+import IStepData from '../../../../interfaces/step/IStepData';
+import IStepMetadata from '../../../../interfaces/step/IStepMetadata';
+import domIdentifiers from '../../../config/domIdentifiers';
+import ClassUtil from '../../../util/ClassUtil';
+import DomUtil from '../../../util/DomUtil';
+import PageUtil from '../../../util/PageUtil';
+import Module from '../../Module';
+import StepKeyboardShortcutsModule from './keyboard/StepKeyboardShortcutsModule';
 
+/**
+ * A module which runs on each individual step page.
+ */
 export default class StepModule extends Module {
     readonly data: IStepData | null;
     readonly metadata: IStepMetadata | null;
@@ -177,7 +181,13 @@ export default class StepModule extends Module {
     }
 
     start(): void {
+        if (!PageUtil.isPageStep) {
+            return;
+        }
+
         this.addProgressIndicators();
         this.addDuplicateNav();
+
+        new StepKeyboardShortcutsModule().start();
     }
 }

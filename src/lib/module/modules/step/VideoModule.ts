@@ -1,8 +1,8 @@
-import domIdentifiers from '../../config/domIdentifiers';
-import TapEventListener from '../../event/TapEventListener';
-import ClassUtil from '../../util/ClassUtil';
-import PageUtil from '../../util/PageUtil';
-import Module from '../Module';
+import domIdentifiers from '../../../config/domIdentifiers';
+import TapEventListener from '../../../event/TapEventListener';
+import ClassUtil from '../../../util/ClassUtil';
+import PageUtil from '../../../util/PageUtil';
+import Module from '../../Module';
 
 export default class VideoModule extends Module {
     private static _secondsToScrub: number = 5;
@@ -57,8 +57,8 @@ export default class VideoModule extends Module {
         this._playbackDisplay.innerText = `Playback Speed: ${newPlaybackRate}`;
     }
 
-    private addKeyHandlers(videoContainer: HTMLElement, video: HTMLVideoElement) {
-        videoContainer.addEventListener('keydown',  (e: KeyboardEvent) => {
+    private addKeyHandlers(video: HTMLVideoElement) {
+        window.addEventListener('keydown',  (e: KeyboardEvent) => {
             if (['ArrowLeft'].includes(e.key)) {
                 video.currentTime = Math.max(video.currentTime - VideoModule._secondsToScrub, 0);
                 e.preventDefault();
@@ -89,7 +89,7 @@ export default class VideoModule extends Module {
                 return;
             }
 
-            if ([' ', 'Space'].includes(e.key)) {
+            if ([' ', 'Space', 'Enter'].includes(e.key)) {
                 this.onTap();
                 e.preventDefault();
                 return;
@@ -150,7 +150,7 @@ export default class VideoModule extends Module {
 
         this.setupPlaybackDisplay(video);
         this.addTapHandler(videoContainer);
-        this.addKeyHandlers(videoContainer, video);
+        this.addKeyHandlers(video);
         this.centerPlayButton(videoContainer);
     }
 

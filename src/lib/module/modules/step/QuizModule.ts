@@ -1,9 +1,9 @@
-import QuizListener, { IQuestionData } from '../../api/quiz/QuizListener';
-import domIdentifiers from '../../config/domIdentifiers';
-import ClassUtil from '../../util/ClassUtil';
-import Debounce from '../../util/Debounce';
-import PageUtil from '../../util/PageUtil';
-import Module from '../Module';
+import QuizListener, { IQuestionData } from '../../../api/quiz/QuizListener';
+import domIdentifiers from '../../../config/domIdentifiers';
+import ClassUtil from '../../../util/ClassUtil';
+import Debounce from '../../../util/Debounce';
+import PageUtil from '../../../util/PageUtil';
+import Module from '../../Module';
 
 export default class QuizModule extends Module {
     private static quizContinueKeys: string[] = ['Enter', 'ArrowRight'];

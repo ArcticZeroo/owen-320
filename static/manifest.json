@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Owen 320 Helper",
+  "name": "Owen CL Helper",
   "version": "0.0.1",
-  "description": "Adds extra functionality to the owen 320 page",
+  "description": "Adds extra functionality to owen's courselib pages",
   "content_scripts": [{
     "js": ["bundle.js"],
     "matches": ["https://facweb.cse.msu.edu/cbowen/cse*"],
