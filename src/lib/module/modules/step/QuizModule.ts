@@ -1,6 +1,7 @@
 import QuizListener, { IQuestionData } from '../../../api/quiz/QuizListener';
 import domIdentifiers from '../../../config/domIdentifiers';
 import ClassUtil from '../../../util/ClassUtil';
+import Debounce from '../../../util/Debounce';
 import PageUtil from '../../../util/PageUtil';
 import Module from '../../Module';
 
