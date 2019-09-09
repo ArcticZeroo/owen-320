@@ -30,7 +30,8 @@ export default class StepKeyboardShortcutsModule extends Module {
             for (const [keys, shortcut] of this.shortcuts) {
                 if (keys.includes(event.key)) {
                     shortcut();
-                    break;
+                    event.preventDefault();
+                    return;
                 }
             }
         });
