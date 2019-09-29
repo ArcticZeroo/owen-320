@@ -13,6 +13,10 @@ export default class StepKeyboardShortcutsModule extends Module {
             return true;
         }
 
+        if ((<HTMLElement>activeElement).isContentEditable) {
+            return false;
+        }
+
         return !StepKeyboardShortcutsModule.illegalActiveTagNamesForShortcuts.includes(activeElement.tagName.toLowerCase());
     }
 
