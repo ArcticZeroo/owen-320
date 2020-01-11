@@ -7,6 +7,10 @@ export default abstract class PageUtil {
         return !!(elements && elements.length && elements[0]);
     }
 
+    static get isPageCourseLib(): boolean {
+        return Boolean(document.getElementById(domIdentifiers.siteDataId))
+    }
+
     static get isPageStep(): boolean {
         return !!document.getElementById(domIdentifiers.stepDataId);
     }
