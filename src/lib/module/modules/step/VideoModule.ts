@@ -72,7 +72,7 @@ export default class VideoModule extends Module {
             return;
         }
 
-        // Clamp newPlaybackRate between 0 and 16
+        // 16 is the maximum value for a video element's playback rate
         newPlaybackRate = Math.max(0, Math.min(newPlaybackRate, 16));
 
         this._playbackRate = newPlaybackRate;
