@@ -20,7 +20,7 @@ export default abstract class PageUtil {
     }
 
     static get isPageVideo(): boolean {
-        return PageUtil.isClassElementPresent(domIdentifiers.videoClass);
+        return PageUtil.isClassElementPresent(domIdentifiers.videoCourseLibClass);
     }
 
     static getNavigationBar(): HTMLUListElement | null {

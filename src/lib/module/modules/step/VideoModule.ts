@@ -9,9 +9,27 @@ import Module from '../../Module';
 export default class VideoModule extends Module {
     private static _secondsToScrub: number = 5;
     private static _playbackRateIncrementInSeconds: number = 0.125;
+    private _playbackRate: number = VideoModule.getPlaybackSpeedFromStorage();
     private _video?: HTMLVideoElement;
     private _videoContainer?: HTMLElement;
     private _playbackDisplay?: HTMLElement;
+    private _windowKeyHandlers?: (e: KeyboardEvent) => void;
+
+    private static getPlaybackSpeedFromStorage(): number {
+        const storedPlaybackSpeedString = StorageUtil.getItem(localStorageIdentifiers.videoPlaybackSpeed);
+
+        if (!storedPlaybackSpeedString) {
+            return 1.0;
+        }
+
+        const storedPlaybackSpeedValue = Number.parseFloat(storedPlaybackSpeedString);
+
+        if (Number.isNaN(storedPlaybackSpeedValue)) {
+            return 1.0;
+        }
+
+        return storedPlaybackSpeedValue;
+    }
 
     constructor() {
         super();
@@ -19,15 +37,14 @@ export default class VideoModule extends Module {
         ClassUtil.autoBind(this);
     }
 
-    private onMutation(mutations: MutationRecord[], observer: MutationObserver): void {
+    private onMutation(mutations: MutationRecord[]): void {
        for (const mutation of mutations) {
            if (!(mutation.target instanceof Element)) {
                continue;
            }
 
-           if (mutation.target.id === domIdentifiers.videoId) {
+           if (mutation.target.classList.contains(domIdentifiers.videoElementClass)) {
                this.addVideoHooks(mutation.target as HTMLVideoElement);
-               observer.disconnect();
                return;
            }
        }
@@ -51,17 +68,28 @@ export default class VideoModule extends Module {
     }
 
     private updatePlaybackRate(newPlaybackRate: number) {
-        if (!this._video || !this._playbackDisplay) {
+        if (!this._video) {
             return;
         }
 
+        // Clamp newPlaybackRate between 0 and 16
+        newPlaybackRate = Math.max(0, Math.min(newPlaybackRate, 16));
+
+        this._playbackRate = newPlaybackRate;
         this._video.playbackRate = newPlaybackRate;
-        this._playbackDisplay.innerText = `Playback Speed: ${newPlaybackRate}`;
         StorageUtil.setItem(localStorageIdentifiers.videoPlaybackSpeed, newPlaybackRate);
+
+        if (this._playbackDisplay) {
+            this._playbackDisplay.innerText = `Playback Speed: ${newPlaybackRate}`;
+        }
     }
 
     private addKeyHandlers(video: HTMLVideoElement) {
-        window.addEventListener('keydown',  (e: KeyboardEvent) => {
+        if (this._windowKeyHandlers) {
+            window.removeEventListener('keydown', this._windowKeyHandlers);
+        }
+
+        this._windowKeyHandlers = (e: KeyboardEvent) => {
             if (['ArrowLeft'].includes(e.key)) {
                 video.currentTime = Math.max(video.currentTime - VideoModule._secondsToScrub, 0);
                 e.preventDefault();
@@ -75,13 +103,13 @@ export default class VideoModule extends Module {
             }
 
             if (['_', '-'].includes(e.key)) {
-                this.updatePlaybackRate(Math.max(video.playbackRate - VideoModule._playbackRateIncrementInSeconds, 0));
+                this.updatePlaybackRate(this._playbackRate - VideoModule._playbackRateIncrementInSeconds);
                 e.preventDefault();
                 return;
             }
 
             if (['+', '='].includes(e.key)) {
-                this.updatePlaybackRate(video.playbackRate + VideoModule._playbackRateIncrementInSeconds);
+                this.updatePlaybackRate(this._playbackRate + VideoModule._playbackRateIncrementInSeconds);
                 e.preventDefault();
                 return;
             }
@@ -97,7 +125,9 @@ export default class VideoModule extends Module {
                 e.preventDefault();
                 return;
             }
-        });
+        };
+
+        window.addEventListener('keydown', this._windowKeyHandlers);
     }
 
     private addTapHandler(videoContainer: HTMLElement) {
@@ -105,12 +135,22 @@ export default class VideoModule extends Module {
         tapListener.listen();
     }
 
-    private setupPlaybackDisplay(video: HTMLVideoElement) {
-        const videoContentDiv = document.getElementsByClassName(domIdentifiers.videoClass)[0];
+    private addVideoPlayHandler(video: HTMLVideoElement) {
+        video.addEventListener('play', () => {
+            video.playbackRate = this._playbackRate;
+        });
+    }
+
+    private setupPlaybackDisplay() {
+        if (this._playbackDisplay) {
+            return;
+        }
+
+        const videoContentDiv = document.getElementsByClassName(domIdentifiers.videoCourseLibClass)[0];
 
         if (videoContentDiv) {
             this._playbackDisplay = document.createElement('div');
-            this.updatePlaybackRate(video.playbackRate);
+            this.updatePlaybackRate(this._playbackRate);
             videoContentDiv.insertAdjacentElement('afterend', this._playbackDisplay);
         }
     }
@@ -141,37 +181,28 @@ export default class VideoModule extends Module {
         playButton.style.left = `${newLeft}px`;
     }
 
-    private setInitialSpeedFromStorage(video: HTMLVideoElement) {
-        const storedPlaybackSpeedString = StorageUtil.getItem(localStorageIdentifiers.videoPlaybackSpeed);
-
-        if (!storedPlaybackSpeedString) {
-            return;
-        }
-
-        const storedPlaybackSpeedValue = Number.parseFloat(storedPlaybackSpeedString);
-
-        if (Number.isNaN(storedPlaybackSpeedValue)) {
-            return;
-        }
-
-        video.playbackRate = storedPlaybackSpeedValue;
-    }
 
     private addVideoHooks(video: HTMLVideoElement) {
-        const videoContainer = document.getElementById(domIdentifiers.videoContainerId);
+        // Don't add hooks to the same video instance twice
+        if (this._video === video) {
+            return;
+        }
 
-        if (!videoContainer) {
+        const videoContainer = document.getElementsByClassName(domIdentifiers.videoContainerClass)[0];
+
+        if (!videoContainer || !(videoContainer instanceof HTMLElement)) {
             return;
         }
 
         this._videoContainer = videoContainer;
         this._video = video;
 
-        this.setInitialSpeedFromStorage(video);
-        this.setupPlaybackDisplay(video);
+        this.setupPlaybackDisplay();
+        this.addVideoPlayHandler(video);
         this.addTapHandler(videoContainer);
         this.addKeyHandlers(video);
         this.centerPlayButton(videoContainer);
+        this.updatePlaybackRate(this._playbackRate);
     }
 
     start(): void {
@@ -179,14 +210,13 @@ export default class VideoModule extends Module {
             return;
         }
 
-        const video = document.getElementById(domIdentifiers.videoId);
+        const video = document.querySelector(domIdentifiers.videoElementSelector);
 
         if (video) {
             this.addVideoHooks(video as HTMLVideoElement);
-            return;
         }
 
-        const videoContainer = document.getElementsByClassName(domIdentifiers.videoClass)[0];
+        const videoContainer = document.getElementsByClassName(domIdentifiers.videoCourseLibClass)[0];
 
         const observer = new MutationObserver(this.onMutation);
 

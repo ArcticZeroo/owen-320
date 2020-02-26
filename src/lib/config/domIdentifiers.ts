@@ -1,8 +1,9 @@
 export default {
-    videoClass: 'cl-video',
     quizClass: 'cl-quiz',
-    videoId: 'vjs_video_3_html5_api',
-    videoContainerId: 'vjs_video_3',
+    videoCourseLibClass: 'cl-video',
+    videoElementSelector: 'video.vjs-tech',
+    videoElementClass: 'vjs-tech',
+    videoContainerClass: 'video-js',
     stepDataId: 'cl-step',
     siteDataId: 'cl-site',
     msuLinkHeaderClass: 'masthead',
