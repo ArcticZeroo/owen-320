@@ -198,19 +198,32 @@ export default class StepModule extends Module {
         content.insertAdjacentElement('afterend', clonedNav);
     }
 
+    private static getRemainingWidthPerSide(): number {
+        const [, stepBodyMax] = StepModule.stepBodyLimitsInPx;
+        const minPossibleWidthInPx = (document.body.clientWidth - stepBodyMax) / 2;
+
+        const owenBody = document.getElementsByClassName(domIdentifiers.owenBodyClass)[0];
+        if (!owenBody) {
+            return minPossibleWidthInPx;
+        }
+
+        const computedStyle = getComputedStyle(owenBody);
+
+        if (!computedStyle.marginLeft) {
+            return minPossibleWidthInPx;
+        }
+
+        return Number.parseInt(computedStyle.marginLeft.replace(/[^-\d.]/g, ''));
+    }
+
     addSidebar() {
         if (!this.data || !this.metadata || !this.metadata.current) {
             return;
         }
 
-        const owenBody = document.getElementsByClassName(domIdentifiers.owenBodyClass)[0];
-        if (!owenBody) {
-            return;
-        }
+        const sidebarWidthInPx = Math.max(StepModule.getRemainingWidthPerSide(), StepModule.sidebarMinWidthInPx);
 
-        const [stepBodyMin] = StepModule.stepBodyLimitsInPx;
-        const remainingWidthPerSide = Number.parseInt((getComputedStyle(owenBody).paddingLeft || (stepBodyMin / 2).toString()).replace(/[^\d]/g, ''));
-        const sidebarWidthInPx = Math.max(remainingWidthPerSide, StepModule.sidebarMinWidthInPx);
+        console.log('width should be', sidebarWidthInPx);
 
         const sidebar = document.createElement('div');
         const sidebarHeader = document.createElement('div');
@@ -275,6 +288,7 @@ export default class StepModule extends Module {
                 sidebar.style.height = (sidebarHeader.offsetHeight + paddingTopInPx * 2) + 'px';
             }
 
+            sidebarHeader.title = 'Click to ' + (isExpanded ? 'collapse' : 'expand');
             sidebar.style.overflow = isExpanded ? 'auto' : 'hidden';
             sectionTable.style.visibility = isExpanded ? 'visible' : 'collapse';
             sidebarExpandButtonIcon.className = `${constants.classPrefix}sidebar-expand-icon fas fa-${isExpanded ? 'minus' : 'plus'}`;
