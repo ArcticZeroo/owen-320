@@ -21,7 +21,7 @@ It works on any CSE faculty website that seems to be using courselib
 * There is an extra nav bar on the bottom of the assignment pages now (you can't hover over it though, too lazy to figure that out)
   * Sometimes the nav bar is on the top for some reason. I think the CSE 477 website is laid out differently
 * `Shift` + (`B`, `N`, `M`, `L`) will navigate (Back, Next, Next and Mark Complete, List) through pages
-  * If there are more than four buttons on the nav bar this won't work. For instance, in CSE 335, Owen added a "UML" button after the "List" button, which broke this functionality since it relied on the relative positions of the buttons.
+* There is a step sidebar on all step section pages which allow quick navigation between steps (basically an abbreviated version of the list page)
 
 #### Videos
 
