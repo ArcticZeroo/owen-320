@@ -90,6 +90,10 @@ export default class VideoModule extends Module {
         }
 
         this._windowKeyHandlers = (e: KeyboardEvent) => {
+            if (!PageUtil.canUseKeyboardShortcuts) {
+                return;
+            }
+
             if (['ArrowLeft'].includes(e.key)) {
                 video.currentTime = Math.max(video.currentTime - VideoModule._secondsToScrub, 0);
                 e.preventDefault();

@@ -1,11 +1,20 @@
+import Optional from '../../../interfaces/Optional';
 import domIdentifiers from '../../config/domIdentifiers';
 import ClassUtil from '../../util/ClassUtil';
 
 export default class StepNavController {
-    private readonly listLink: HTMLAnchorElement;
-    private readonly previousLink: HTMLAnchorElement;
-    private readonly nextLink: HTMLAnchorElement;
-    private readonly nextAndMarkLink: HTMLAnchorElement;
+    private readonly listLink: Optional<HTMLAnchorElement>;
+    private readonly previousLink: Optional<HTMLAnchorElement>;
+    private readonly nextLink: Optional<HTMLAnchorElement>;
+    private readonly nextAndMarkLink: Optional<HTMLAnchorElement>;
+
+    private static imgToLink(img: Optional<Element>): Optional<HTMLAnchorElement> {
+        if (!img) {
+            return null;
+        }
+
+        return img.parentElement as HTMLAnchorElement;
+    }
 
     constructor(stepNavDiv?: Element) {
         ClassUtil.autoBind(this);
@@ -14,27 +23,32 @@ export default class StepNavController {
             stepNavDiv = document.getElementsByClassName(domIdentifiers.navDivClass)[0];
         }
 
-        [
-            this.listLink,
-            this.previousLink,
-            this.nextLink,
-            this.nextAndMarkLink
-        ] = Array.from(stepNavDiv.getElementsByTagName('a'));
+        this.listLink = StepNavController.imgToLink(stepNavDiv.querySelector(domIdentifiers.navListSelector));
+
+        const [
+            previousImg,
+            nextImg,
+            nextAndMarkImg
+        ] = Array.from(stepNavDiv.querySelectorAll(domIdentifiers.navArrowsSelector));
+
+        this.previousLink = StepNavController.imgToLink(previousImg);
+        this.nextLink = StepNavController.imgToLink(nextImg);
+        this.nextAndMarkLink = StepNavController.imgToLink(nextAndMarkImg);
     }
 
     goToList() {
-        this.listLink.click();
+        this.listLink && this.listLink.click();
     }
 
     goToPrevious() {
-        this.previousLink.click();
+        this.previousLink && this.previousLink.click();
     }
 
     goToNext() {
-        this.nextLink.click();
+        this.nextLink && this.nextLink.click();
     }
 
     goToNextAndMark() {
-        this.nextAndMarkLink.click();
+        this.nextAndMarkLink && this.nextAndMarkLink.click();
     }
 }

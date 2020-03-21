@@ -1,6 +1,8 @@
 import ISiteData from '../../interfaces/site/ISiteData';
 import domIdentifiers from '../config/domIdentifiers';
 export default abstract class PageUtil {
+    private static readonly illegalActiveTagNamesForShortcuts = ['input', 'textarea'];
+
     static isClassElementPresent(className: string): boolean {
         const elements = document.getElementsByClassName(className);
 
@@ -35,5 +37,19 @@ export default abstract class PageUtil {
         }
 
         return JSON.parse(siteDataElement.innerText);
+    }
+
+    static get canUseKeyboardShortcuts(): boolean {
+        const activeElement = document.activeElement;
+
+        if (!activeElement) {
+            return true;
+        }
+
+        if ((<HTMLElement>activeElement).isContentEditable) {
+            return false;
+        }
+
+        return !PageUtil.illegalActiveTagNamesForShortcuts.includes(activeElement.tagName.toLowerCase());
     }
 }
