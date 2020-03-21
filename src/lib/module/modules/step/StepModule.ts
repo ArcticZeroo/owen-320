@@ -221,8 +221,8 @@ export default class StepModule extends Module {
         sidebar.style.width = sidebarWidthInPx + 'px';
 
         sidebarHeader.className = `${constants.classPrefix}sidebar-header`;
-        sidebarTitle.innerText = this.data.name + ' ' + this.getProgressString(this.metadata.current.index + 1);
 
+        let completeCount = 0;
         for (const section of this.data.sections) {
             const sectionRow = document.createElement('tr');
 
@@ -239,6 +239,7 @@ export default class StepModule extends Module {
                 let title = `First viewed at ${new Date(section.look * 1000).toLocaleString()}`;
                 if (section.status === SectionStatus.done) {
                     title += `, marked complete at ${new Date(section.access * 1000).toLocaleString()}`;
+                    completeCount++;
                 }
                 sectionStatusContainer.title = title;
             } else {
@@ -257,6 +258,8 @@ export default class StepModule extends Module {
 
             sectionTable.appendChild(sectionRow);
         }
+
+        sidebarTitle.innerText = this.data.name + ' ' + this.getProgressString(completeCount);
 
         let isExpanded = true;
 

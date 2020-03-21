@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Owen CL Helper",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Adds extra functionality to owen's courselib pages",
   "content_scripts": [{
     "js": ["bundle.js"],
