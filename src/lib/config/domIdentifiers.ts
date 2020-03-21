@@ -11,5 +11,6 @@ export default {
     stepProgressClass: 'cl-step-progress',
     navDivClass: 'cl-stepnav-div',
     navArrowsSelector: 'img[alt="Mark Complete"]',
-    navListSelector: 'img[alt="Return to Step"]'
+    navListSelector: 'img[alt="Return to Step"]',
+    owenBodyClass: 'body'
 }

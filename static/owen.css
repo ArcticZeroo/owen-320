@@ -1,0 +1,45 @@
+.cl-helper-step-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: white;
+    z-index: 100000; /** it looks like 10,000 is the highest one in his stylesheet, so adding a 0 to be safe **/
+    padding: 0.5rem;
+}
+
+.cl-helper-step-sidebar table {
+    margin: 0;
+}
+
+.cl-helper-step-sidebar table td {
+    border: none;
+}
+
+.cl-helper-step-sidebar .cl-helper-section-status-D {
+    color: #2E7D32;
+}
+
+.cl-helper-step-sidebar .cl-helper-section-status-V {
+    color: #81C784;
+}
+
+.cl-helper-step-sidebar .cl-helper-section-status-N {
+    color: #9E9E9E;
+}
+
+/** current, but not done **/
+.cl-helper-step-sidebar .cl-helper-section-current-true.cl-helper-section-status-V {
+    color: #4FC3F7;
+}
+
+/** current, and done **/
+.cl-helper-step-sidebar .cl-helper-section-current-true.cl-helper-section-status-D {
+    color: #0277BD;
+}
+
+.cl-helper-step-sidebar .cl-helper-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    align-items: center;
+}

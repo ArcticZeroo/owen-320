@@ -1,4 +1,5 @@
 export default {
     prefix: '__cl_helper:',
-    videoPlaybackSpeed: 'videoPlaybackSpeed'
+    videoPlaybackSpeed: 'videoPlaybackSpeed',
+    sidebarExpanded: 'sidebarExpanded'
 }

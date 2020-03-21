@@ -1,18 +1,36 @@
+import Optional from '../../../../interfaces/Optional';
 import IStepData from '../../../../interfaces/step/IStepData';
 import IStepMetadata from '../../../../interfaces/step/IStepMetadata';
+import constants from '../../../config/constants';
 import domIdentifiers from '../../../config/domIdentifiers';
+import localStorageIdentifiers from '../../../config/localStorageIdentifiers';
+import SectionStatus from '../../../enum/SectionStatus';
 import ClassUtil from '../../../util/ClassUtil';
 import DomUtil from '../../../util/DomUtil';
 import PageUtil from '../../../util/PageUtil';
+import StorageUtil from '../../../util/StorageUtil';
 import Module from '../../Module';
 import StepKeyboardShortcutsModule from './keyboard/StepKeyboardShortcutsModule';
+import local = chrome.storage.local;
 
 /**
  * A module which runs on each individual step page.
  */
 export default class StepModule extends Module {
-    readonly data: IStepData | null;
-    readonly metadata: IStepMetadata | null;
+    private static readonly stepBodyLimitsInPx = [575, 1000];
+    private static readonly sidebarMinWidthInPx = 250;
+    private static readonly sectionTypeToIconName = {
+        'V': 'fas fa-video',
+        'S': 'fas fa-pencil-alt',
+        'Q': 'fas fa-vial',
+        'T': 'fas fa-hammer',
+        Unknown: 'fas fa-question'
+    };
+
+    // Holds all the data for the current step
+    readonly data: Optional<IStepData>;
+    // Holds the metadata for the current section
+    readonly metadata: Optional<IStepMetadata>;
     private sectionHoverDiv?: HTMLElement;
     private sectionNameToIndex: { [key: string]: number } = {};
 
@@ -37,7 +55,7 @@ export default class StepModule extends Module {
         return JSON.parse(dataText);
     }
 
-    private processData(data: IStepData | null): IStepMetadata | null {
+    private processData(data: Optional<IStepData>): Optional<IStepMetadata> {
         if (!data) {
             return null;
         }
@@ -72,7 +90,7 @@ export default class StepModule extends Module {
     }
 
     private getProgressString(current: number) {
-        return `(${ current }/${ this.totalSections })`;
+        return `(${current}/${this.totalSections})`;
     }
 
     private get totalSections(): number {
@@ -106,7 +124,7 @@ export default class StepModule extends Module {
                 }
             }
 
-            target.innerText += ` ${ this.getProgressString(this.sectionNameToIndex[pageName] + 1) }`;
+            target.innerText += ` ${this.getProgressString(this.sectionNameToIndex[pageName] + 1)}`;
             break;
         }
     }
@@ -119,13 +137,13 @@ export default class StepModule extends Module {
         }
 
         const progressElement = document.createElement('li');
-        progressElement.innerText = `Progress: ${ this.getProgressString(this.metadata.current.index + 1) }`;
+        progressElement.innerText = `Progress: ${this.getProgressString(this.metadata.current.index + 1)}`;
 
         navigationBar.appendChild(progressElement);
     }
 
     private addHoverProgressIndicator() {
-        const hoverDiv = document.querySelector(`.${ domIdentifiers.stepProgressClass } div`);
+        const hoverDiv = document.querySelector(`.${domIdentifiers.stepProgressClass} div`);
 
         if (!hoverDiv) {
             return;
@@ -180,6 +198,114 @@ export default class StepModule extends Module {
         content.insertAdjacentElement('afterend', clonedNav);
     }
 
+    addSidebar() {
+        if (!this.data || !this.metadata || !this.metadata.current) {
+            return;
+        }
+
+        const owenBody = document.getElementsByClassName(domIdentifiers.owenBodyClass)[0];
+        if (!owenBody) {
+            return;
+        }
+
+        const [stepBodyMin] = StepModule.stepBodyLimitsInPx;
+        const remainingWidthPerSide = Number.parseInt((getComputedStyle(owenBody).paddingLeft || (stepBodyMin / 2).toString()).replace(/[^\d]/g, ''));
+        const sidebarWidthInPx = Math.max(remainingWidthPerSide, StepModule.sidebarMinWidthInPx);
+
+        const sidebar = document.createElement('div');
+        const sidebarHeader = document.createElement('div');
+        const sidebarTitle = document.createElement('div');
+        const sectionTable = document.createElement('table');
+
+        sidebar.className = `${constants.classPrefix}step-sidebar`;
+        sidebar.style.width = sidebarWidthInPx + 'px';
+
+        sidebarHeader.className = `${constants.classPrefix}sidebar-header`;
+        sidebarTitle.innerText = this.data.name + ' ' + this.getProgressString(this.metadata.current.index + 1);
+
+        for (const section of this.data.sections) {
+            const sectionRow = document.createElement('tr');
+
+            const sectionStatusContainer = document.createElement('td');
+            const sectionStatusIcon = document.createElement('i');
+            sectionStatusContainer.appendChild(sectionStatusIcon);
+
+            const sectionStatusIconClass = StepModule.sectionTypeToIconName[section.type] || StepModule.sectionTypeToIconName.Unknown;
+            const sectionStatusTypeClass = `${constants.classPrefix}section-status-${section.status}`;
+            const sectionStatusCurrentClass = `${constants.classPrefix}section-current-${section.tag === this.metadata.current.section.tag}`;
+            sectionStatusIcon.className = `${sectionStatusIconClass} ${sectionStatusTypeClass} ${sectionStatusCurrentClass}`;
+
+            if (section.status === SectionStatus.done || section.status === SectionStatus.viewed) {
+                let title = `First viewed at ${new Date(section.look * 1000).toLocaleString()}`;
+                if (section.status === SectionStatus.done) {
+                    title += `, marked complete at ${new Date(section.access * 1000).toLocaleString()}`;
+                }
+                sectionStatusContainer.title = title;
+            } else {
+                sectionStatusContainer.title = 'Not yet viewed';
+            }
+
+            const sectionLinkContainer = document.createElement('td');
+            const sectionLink = document.createElement('a');
+            sectionLinkContainer.appendChild(sectionLink);
+
+            sectionLink.href = section.url;
+            sectionLink.innerText = section.name;
+
+            sectionRow.appendChild(sectionStatusContainer);
+            sectionRow.appendChild(sectionLinkContainer);
+
+            sectionTable.appendChild(sectionRow);
+        }
+
+        let isExpanded = true;
+
+        const sidebarExpandButtonIcon = document.createElement('i');
+
+        const updateSidebarExpansion = () => {
+            StorageUtil.setItem(localStorageIdentifiers.sidebarExpanded, isExpanded);
+
+            if (isExpanded) {
+                sidebar.style.height = window.innerHeight + 'px';
+            } else {
+                const paddingTopInPx = Number.parseInt((window.getComputedStyle(sidebar).paddingTop || '0').replace(/[^\d]/g, ''));
+                sidebar.style.height = (sidebarHeader.offsetHeight + paddingTopInPx * 2) + 'px';
+            }
+
+            sidebar.style.overflow = isExpanded ? 'auto' : 'hidden';
+            sectionTable.style.visibility = isExpanded ? 'visible' : 'collapse';
+            sidebarExpandButtonIcon.className = `${constants.classPrefix}sidebar-expand-icon fas fa-${isExpanded ? 'minus' : 'plus'}`;
+        };
+
+        sidebarHeader.addEventListener('click', e => {
+            e.preventDefault();
+            isExpanded = !isExpanded;
+            updateSidebarExpansion();
+        });
+
+        sidebarHeader.appendChild(sidebarTitle);
+        sidebarHeader.appendChild(sidebarExpandButtonIcon);
+
+        sidebar.appendChild(sidebarHeader);
+        sidebar.appendChild(sectionTable);
+        document.body.appendChild(sidebar);
+
+        const scrollBarWidth = sidebar.offsetWidth - sidebar.clientWidth;
+        if (scrollBarWidth > 0) {
+            sidebar.style.width = (sidebarWidthInPx - scrollBarWidth) + 'px';
+        }
+
+        const storedSidebarExpansion = StorageUtil.getItem(localStorageIdentifiers.sidebarExpanded) === 'true';
+
+        // doing this here so we have offset values intact
+        updateSidebarExpansion();
+
+        if (storedSidebarExpansion != isExpanded) {
+            isExpanded = storedSidebarExpansion;
+            updateSidebarExpansion();
+        }
+    }
+
     start(): void {
         if (!PageUtil.isPageStep) {
             return;
@@ -187,6 +313,7 @@ export default class StepModule extends Module {
 
         this.addProgressIndicators();
         this.addDuplicateNav();
+        this.addSidebar();
 
         new StepKeyboardShortcutsModule().start();
     }

@@ -5,6 +5,7 @@
   "description": "Adds extra functionality to owen's courselib pages",
   "content_scripts": [{
     "js": ["bundle.js"],
+    "css": ["owen.css"],
     "matches": ["https://facweb.cse.msu.edu/*"],
     "run_at": "document_idle"
   }],
