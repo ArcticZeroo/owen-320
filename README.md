@@ -48,6 +48,21 @@ It works on any CSE faculty website that seems to be using courselib
 
 ## Installation
 
+You can find the extension on these web stores:
+
+- [Chrome web store](https://chrome.google.com/webstore/detail/owen-cl-helper/gmlgnninocoenengbjdmjnidgabmpkmd?hl=en)
+- [Firefox add-on store]()
+
 [Install on the chrome web store](https://chrome.google.com/webstore/detail/owen-cl-helper/gmlgnninocoenengbjdmjnidgabmpkmd?hl=en)
 
-I have no current plans to port to firefox, safari, etc.
+I do not have plans to port it to any other browsers because I only use Chrome as my main browser, and initially developed the extension for personal use. If there is enough interest in a particular browser, and there is no fee (or a very small fee), I will look into porting the extension. There should not be any chrome-specific code, though, so you can probably package and install it as a developer extension yourself.
+
+### Building from source
+
+Should be pretty easy.
+
+1. Clone the repo
+2. `npm i`
+3. `npx webpack`
+4. The output of the extension will be in `dist/`, you can then zip it into an extension.
+ 
